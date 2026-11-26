@@ -1,7 +1,6 @@
 """Read-only: 160 recent real arXiv titles for the opening 'wall of papers' (from the local DB)."""
 import json, sqlite3, sys
 from pathlib import Path
-from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "server"))
 from paperscroll import config
 c = sqlite3.connect(f"file:{config.DB_PATH}?mode=ro", uri=True)
