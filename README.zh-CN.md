@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> ·
+  受 <a href="https://paperdance.org">PaperDance</a> 启发 · <a href="README.md">English</a> ·
   <a href="docs/server.md">服务端部署</a> ·
   <a href="docs/android.md">安卓 App</a> ·
   <a href="docs/how-it-works.md">原理</a> ·
@@ -27,6 +27,11 @@
 ---
 
 ## 这是什么
+
+PaperScroll **受 [PaperDance（纸上跳舞）](https://paperdance.org) 启发而开发**。PaperDance 让我们看到，用「刷」的方式浏览新论文
+可以很轻松；PaperScroll 在这个想法的基础上做成了一套开源、可自行部署的方案：完全运行在你自己的电脑上，
+配有原生安卓 App，并加入了一些自己的功能（问题 / 方法 / 结果一眼看懂、会议级别、在本地学习你偏好的推荐）。
+
 
 arXiv 每天上新几百篇，光看标题就要花很久。PaperScroll 把它变成一个可以上下滑的信息流：每张卡片给出论文的
 关键配图，以及从摘要里挑出的**问题、方法、结果**三句话，几秒钟就能判断值不值得细读。你的喜欢、收藏和跳过会

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <a href="README.zh-CN.md">中文说明</a> ·
+  Inspired by <a href="https://paperdance.org">PaperDance</a> · <a href="README.zh-CN.md">中文说明</a> ·
   <a href="docs/server.md">Server setup</a> ·
   <a href="docs/android.md">Android app</a> ·
   <a href="docs/how-it-works.md">How it works</a> ·
@@ -27,6 +27,12 @@
 ---
 
 ## Why
+
+PaperScroll is **inspired by [PaperDance](https://paperdance.org)** (纸上跳舞), which showed how pleasant it is to
+browse new papers as a swipeable feed. We built PaperScroll as an open-source, self-hosted take on that idea:
+it runs entirely on your own computer, comes with a native Android app, and adds a few things of its own
+(problem / method / result at a glance, venue levels, local recommendations that learn from you).
+
 
 Keeping up with arXiv means skimming hundreds of new titles a day. PaperScroll turns that into a feed you
 can swipe through on the bus: every card shows the key figure and the three sentences of the abstract that
