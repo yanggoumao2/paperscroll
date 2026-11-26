@@ -1,0 +1,48 @@
+<!doctype html>
+<!-- Cover / thumbnail for the promo video (1920x1080). Rendered by cover.py. ?play=1 adds a play button (README poster). -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: "Crimson Pro"; src: url("../web/fonts/CrimsonPro-normal-400_700.woff2") format("woff2"); font-weight: 400 700; }
+@font-face { font-family: "Crimson Pro"; font-style: italic; src: url("../web/fonts/CrimsonPro-italic-400_600.woff2") format("woff2"); font-weight: 400 600; }
+@font-face { font-family: "Atkinson"; src: url("../web/fonts/AtkinsonHyperlegible-normal-700.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "Plex Mono"; src: url("../web/fonts/IBMPlexMono-normal-500.woff2") format("woff2"); font-weight: 500; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; }
+body { background: radial-gradient(ellipse at 72% 40%, #3a2a1c 0%, #1d1813 45%, #110e0b 100%); color: #F3EEE4; font-family: "Atkinson", "Microsoft YaHei", sans-serif; position: relative; }
+#grain { position: absolute; inset: 0; opacity: .08; background-image:
+  url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/></filter><rect width='240' height='240' filter='url(%23n)'/></svg>"); }
+/* stacked cards behind the phone */
+.ghost { position: absolute; width: 400px; height: 866px; border-radius: 50px; background: #F3EEE4; opacity: .10; }
+#phone { position: absolute; left: 1210px; top: 92px; width: 430px; height: 896px; border-radius: 60px; background: #0c0a08; padding: 15px;
+  transform: rotate(5deg); box-shadow: 0 60px 120px -30px rgba(0,0,0,.8), 0 0 0 2px #3b342b inset, 0 0 120px rgba(194,59,34,.25); }
+#phone img { width: 400px; height: 866px; border-radius: 46px; display: block; }
+#seal { position: absolute; left: 1600px; top: 40px; width: 170px; height: 170px; border-radius: 50%; background: #C23B22; transform: rotate(-12deg);
+  display: grid; place-items: center; box-shadow: 0 20px 40px -10px rgba(0,0,0,.6); }
+#seal::after { content: ""; position: absolute; inset: 13px; border: 3px solid rgba(243,238,228,.85); border-radius: 50%; }
+#seal span { font-family: "Plex Mono", monospace; font-size: 22px; line-height: 1.25; text-align: center; letter-spacing: .06em; }
+.kick { position: absolute; left: 150px; top: 230px; font-family: "Plex Mono", monospace; font-size: 26px; letter-spacing: .2em; color: #E2573C; }
+#logo { position: absolute; left: 150px; top: 300px; width: 120px; height: 120px; border-radius: 26px; }
+#word { position: absolute; left: 140px; top: 440px; font-family: "Crimson Pro", serif; font-size: 172px; line-height: .95; letter-spacing: -.03em; font-weight: 600; }
+#word i { color: #E2573C; font-weight: 400; }
+#tag { position: absolute; left: 150px; top: 640px; font-family: "Crimson Pro", serif; font-style: italic; font-size: 58px; color: #E9DFCB; }
+#tagZh { position: absolute; left: 152px; top: 726px; font-size: 40px; letter-spacing: .16em; color: #CFC6B5; }
+#pills { position: absolute; left: 150px; top: 830px; display: flex; gap: 16px; }
+#pills span { font-family: "Plex Mono", monospace; font-size: 24px; padding: 10px 18px; border: 2px solid rgba(243,238,228,.35); border-radius: 999px; color: #E9DFCB; }
+#play { position: absolute; left: 1010px; top: 560px; width: 190px; height: 190px; margin: -95px 0 0 -95px; border-radius: 50%; background: rgba(194,59,34,.95);
+  box-shadow: 0 20px 50px rgba(0,0,0,.5), 0 0 0 10px rgba(243,238,228,.15); display: none; }
+#play::after { content: ""; position: absolute; left: 74px; top: 52px; border-left: 70px solid #F3EEE4; border-top: 43px solid transparent; border-bottom: 43px solid transparent; }
+body.play #play { display: block; }
+</style></head>
+<body>
+  <div class="ghost" style="left:1150px;top:130px;transform:rotate(-7deg)"></div>
+  <div class="ghost" style="left:1180px;top:110px;transform:rotate(-1deg);opacity:.16"></div>
+  <div id="phone"><img src="shots/card_cvpr.png" alt=""></div>
+  <div id="seal"><span>OPEN<br>SOURCE</span></div>
+  <div class="kick">ARXIV · DAILY · ON YOUR PHONE</div>
+  <img id="logo" src="../app/icon/master-full.png" alt="">
+  <div id="word">Paper<i>Scroll</i></div>
+  <div id="tag">Scroll arXiv like short videos.</div>
+  <div id="tagZh">像刷短视频一样刷论文</div>
+  <div id="pills"><span>Self-hosted</span><span>Free</span><span>Problem · Method · Result</span></div>
+  <div id="play"></div>
+  <div id="grain"></div>
+  <script>if (new URLSearchParams(location.search).get("play")) document.body.classList.add("play");</script>
+</body></html>

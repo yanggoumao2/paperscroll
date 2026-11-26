@@ -17,11 +17,9 @@
   <a href="docs/faq.md">FAQ</a>
 </p>
 
-<p align="center">
-  <a href="https://github.com/yanggoumao2/paperscroll/blob/main/docs/media/paperscroll-promo.mp4">
-    <img src="docs/images/promo-poster.jpg" width="820" alt="Watch the one-minute PaperScroll video"></a><br>
-  <sub>▶ One-minute introduction (English voice-over, Chinese subtitles) — click to play</sub>
-</p>
+https://github.com/user-attachments/assets/83b980bd-9705-48e1-a686-40216ee145d5
+
+<p align="center"><sub>▶ One-minute introduction (English voice-over, Chinese subtitles)</sub></p>
 
 <p align="center">
   <img src="docs/images/feed.jpg" width="820" alt="Three PaperScroll cards on a phone">
