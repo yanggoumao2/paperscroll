@@ -18,6 +18,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/yanggoumao2/paperscroll/blob/main/docs/media/paperscroll-promo.mp4">
+    <img src="docs/images/promo-poster.jpg" width="820" alt="Watch the 60-second PaperScroll video"></a><br>
+  <sub>▶ 60-second introduction (Chinese voice-over, English subtitles) — click to play</sub>
+</p>
+
+<p align="center">
   <img src="docs/images/feed.jpg" width="820" alt="Three PaperScroll cards on a phone">
 </p>
 

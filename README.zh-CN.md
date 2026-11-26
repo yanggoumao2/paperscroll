@@ -18,6 +18,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/yanggoumao2/paperscroll/blob/main/docs/media/paperscroll-promo.mp4">
+    <img src="docs/images/promo-poster.jpg" width="820" alt="观看 60 秒产品介绍视频"></a><br>
+  <sub>▶ 60 秒产品介绍（中文配音 + 中英字幕），点击播放</sub>
+</p>
+
+<p align="center">
   <img src="docs/images/feed.jpg" width="820" alt="PaperScroll 卡片截图">
 </p>
 

@@ -1,0 +1,22 @@
+{
+  "voice": "zh-CN-YunxiNeural",
+  "rate": "+6%",
+  "scenes": [
+    {"id": "hook",    "pad": 0.7, "zh": "arXiv 每天上新几百篇论文。光看标题，就要花掉你一个小时。",
+     "en": "Hundreds of new papers hit arXiv every day. Just skimming the titles eats an hour."},
+    {"id": "brand",   "pad": 0.8, "zh": "PaperScroll，像刷短视频一样刷论文。",
+     "en": "PaperScroll: scroll papers like short videos."},
+    {"id": "feed",    "pad": 0.6, "zh": "一屏一篇，上滑就是下一篇。关键配图，加上问题、方法、结果三句话，几秒钟看懂一篇论文。",
+     "en": "One paper per screen. Swipe up for the next. Key figure plus problem, method and result: a paper in seconds."},
+    {"id": "venue",   "pad": 0.6, "zh": "中了哪个会、是什么级别、被引用了多少次，一眼就知道。",
+     "en": "Which venue, what level, how many citations: all at a glance."},
+    {"id": "reco",    "pad": 0.6, "zh": "双击喜欢，推荐会越刷越懂你；每一篇都告诉你，为什么推荐给你。",
+     "en": "Double-tap to like and the feed learns you, and every card tells you why it was picked."},
+    {"id": "read",    "pad": 0.6, "zh": "想细读，就打开精读，摘要按句子着色；喜欢的论文，一键导出 BibTeX。",
+     "en": "Close reading colours the abstract by role. Export your favourites to BibTeX in one tap."},
+    {"id": "private", "pad": 0.6, "zh": "一切都跑在你自己的电脑上。不用注册，不用付费，数据不出门。",
+     "en": "Everything runs on your own computer. No sign-up, no fees, your data stays home."},
+    {"id": "cta",     "pad": 1.6, "zh": "PaperScroll，受 PaperDance 启发，开源免费。现在就去 GitHub 试试吧。",
+     "en": "PaperScroll. Inspired by PaperDance. Free and open source. Try it on GitHub."}
+  ]
+}

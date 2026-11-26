@@ -1,0 +1,6 @@
+[project]
+name = "paperscroll-promo"
+version = "0.1.0"
+description = "Renders the PaperScroll promo video (frames via Playwright + Edge, voice via edge-tts, sound via numpy, mux via ffmpeg)"
+requires-python = ">=3.11,<3.13"
+dependencies = ["playwright>=1.48", "edge-tts>=6.1", "numpy>=1.26", "pillow>=10"]

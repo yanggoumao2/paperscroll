@@ -9,6 +9,12 @@ tmp = Path(tempfile.gettempdir()) / "paperscroll-sandbox"; tmp.mkdir(exist_ok=Tr
 db_copy = tmp / "copy.db"
 src = sqlite3.connect(f"file:{config.DB_PATH}?mode=ro", uri=True); dst = sqlite3.connect(db_copy); src.backup(dst); src.close(); dst.close()
 config.DB_PATH = db_copy
+import os as _os
+if _os.environ.get("PS_SANDBOX_CLEAN"):   # demo mode: drop the owner's likes, notes, history from the copy
+    _c = sqlite3.connect(db_copy)
+    for _t in ("interactions", "events", "seen"):
+        _c.execute(f"DELETE FROM {_t}")
+    _c.commit(); _c.close()
 from paperscroll import rank, db, jobs
 jobs.start = lambda: __import__("paperscroll.embed", fromlist=["INDEX"]).INDEX.reload()   # no sync/scheduler in the sandbox
 jobs.trigger = lambda *a, **k: False

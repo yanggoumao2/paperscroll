@@ -23,3 +23,16 @@
 !/server/run.py
 /server/*.ps1
 *.log
+# promo video: generated assets (sources are committed)
+/promo/.venv/
+/promo/shots/
+/promo/frames/
+/promo/preview/
+/promo/qa/
+/promo/audio/
+/promo/out/
+/promo/titles.json
+/promo/timeline.json
+/promo/*.log
+/promo/lookup.py
+/promo/find_papers.py
