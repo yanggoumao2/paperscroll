@@ -1,6 +1,7 @@
 # Promo video
 
-Source of `docs/media/paperscroll-promo.mp4` (60 s, 1920×1080, Chinese voice-over with Chinese/English subtitles).
+Source of `docs/media/paperscroll-promo.mp4` (~54 s, 1920×1080, English voice-over, Chinese subtitles).
+`script.json`: `speak` picks the narrated language (`en`/`zh`), `voice` the Edge TTS voice, `subtitle_en` adds an English line under the Chinese subtitle.
 Everything is generated: real app screens from a sandbox copy of the database, scenes drawn in HTML, voice by
 Microsoft Edge neural TTS, music and sound effects synthesised in `audio.py` (no third-party samples).
 

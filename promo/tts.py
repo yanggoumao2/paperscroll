@@ -24,11 +24,11 @@ async def main():
     scenes = []
     for sc in S["scenes"]:
         mp3 = A / f"vo_{sc['id']}.mp3"
-        await edge_tts.Communicate(sc["zh"], S["voice"], rate=S["rate"]).save(str(mp3))
+        await edge_tts.Communicate(sc[S.get("speak", "zh")], S["voice"], rate=S["rate"]).save(str(mp3))
         d = duration(mp3)
         length = LEAD + d + sc["pad"]
         scenes.append({"id": sc["id"], "start": round(t, 3), "end": round(t + length, 3), "vo_at": round(t + LEAD, 3),
-                       "vo_len": round(d, 3), "zh": sc["zh"], "en": sc["en"]})
+                       "vo_len": round(d, 3), "zh": sc["zh"], "en": sc["en"] if S.get("subtitle_en", True) else ""})
         t += length
     (D / "timeline.json").write_text(json.dumps({"total": round(t, 3), "scenes": scenes}, ensure_ascii=False, indent=1),
                                      encoding="utf-8")

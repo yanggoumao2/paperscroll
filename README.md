@@ -19,8 +19,8 @@
 
 <p align="center">
   <a href="https://github.com/yanggoumao2/paperscroll/blob/main/docs/media/paperscroll-promo.mp4">
-    <img src="docs/images/promo-poster.jpg" width="820" alt="Watch the 60-second PaperScroll video"></a><br>
-  <sub>▶ 60-second introduction (Chinese voice-over, English subtitles) — click to play</sub>
+    <img src="docs/images/promo-poster.jpg" width="820" alt="Watch the one-minute PaperScroll video"></a><br>
+  <sub>▶ One-minute introduction (English voice-over, Chinese subtitles) — click to play</sub>
 </p>
 
 <p align="center">

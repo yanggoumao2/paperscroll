@@ -332,7 +332,7 @@ window.render = function (t) {
   const cur = tl.scenes.find((s) => t >= s.vo_at - .15 && t < s.vo_at + s.vo_len + .35);
   const subs = $("#subs");
   if (cur) {
-    $("#subZh").textContent = cur.zh; $("#subEn").textContent = cur.en;
+    $("#subZh").textContent = cur.zh; $("#subEn").textContent = cur.en || ""; $("#subEn").style.display = cur.en ? "" : "none";
     subs.style.opacity = Math.min(seg(t, cur.vo_at - .15, cur.vo_at + .1), 1 - seg(t, cur.vo_at + cur.vo_len + .1, cur.vo_at + cur.vo_len + .35));
   } else subs.style.opacity = 0;
   $("#fade").style.opacity = Math.max(1 - seg(t, 0, .35), seg(t, tl.total - .5, tl.total));
