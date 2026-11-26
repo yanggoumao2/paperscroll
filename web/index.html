@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#F3EEE4" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15130F" media="(prefers-color-scheme: dark)">
+<title>PaperScroll</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <!-- ============ FEED ============ -->
+  <main id="view-feed" class="view active">
+    <header class="masthead">
+      <div class="mast-title"><span class="mast-p">Paper</span><span class="mast-s">Scroll</span></div>
+      <div class="mast-right">
+        <span class="read-count" id="read-count" title="今天读过的论文">今日 <b>0</b></span>
+        <button class="icon-btn" id="btn-refresh" aria-label="换一批">
+          <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg>
+        </button>
+      </div>
+    </header>
+    <div class="ptr" id="ptr" aria-hidden="true"><span class="ptr-seal"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7"/><path d="M20 4v7h-7"/></svg></span><span class="ptr-text">下拉换一批</span></div>
+    <div id="feed" class="feed"></div>
+    <div id="feed-msg" class="feed-msg hidden"></div>
+  </main>
+
+  <!-- ============ LIBRARY ============ -->
+  <main id="view-library" class="view">
+    <header class="page-head">
+      <div class="kicker">My Library</div>
+      <h1>书房</h1>
+      <div class="tabs" id="lib-tabs">
+        <button data-k="like" class="on">喜欢</button><button data-k="save">收藏</button><button data-k="note">笔记</button><button data-k="hidden">不感兴趣</button>
+      </div>
+    </header>
+    <div class="export-bar">
+      <select id="exp-kind" aria-label="导出范围"><option value="all">喜欢 + 收藏</option><option value="like">仅喜欢</option><option value="save">仅收藏</option></select>
+      <select id="exp-fmt" aria-label="导出格式"><option value="bibtex">BibTeX</option><option value="md">Markdown</option><option value="csv">CSV</option><option value="json">JSON</option></select>
+      <button id="exp-go" class="btn small">导出</button>
+    </div>
+    <div id="lib-list" class="lib-list"></div>
+  </main>
+
+  <!-- ============ SETTINGS ============ -->
+  <main id="view-settings" class="view">
+    <header class="page-head">
+      <div class="kicker">Settings</div>
+      <h1>设置</h1>
+    </header>
+    <div class="settings">
+      <section>
+        <h2>我的课题</h2>
+        <label for="s-topic">用一句话描述你关心的方向。英文效果最好。</label>
+        <textarea id="s-topic" rows="3" placeholder="bimanual robot manipulation with diffusion policies and VLA models"></textarea>
+        <label for="s-keywords">子方向关键词（可选，逗号分隔）</label>
+        <input id="s-keywords" placeholder="diffusion policy, VLA, dexterous hand">
+        <div id="prefs" class="prefs"></div>
+        <button id="s-save-profile" class="btn">保存并换一批</button>
+      </section>
+      <section>
+        <h2>阅读</h2>
+        <div class="row"><span>版面</span><div class="seg" id="s-theme"><button data-v="auto">跟随系统</button><button data-v="paper">纸面</button><button data-v="night">夜读</button></div></div>
+        <div class="row"><span>信息量</span><div class="seg" id="s-density"><button data-v="min">精简</button><button data-v="std">标准</button><button data-v="full">详读</button></div></div>
+        <div class="row"><span>字号</span><input type="range" id="s-font" min="14" max="21" step="1" aria-label="字号"></div>
+      </section>
+      <section>
+        <h2>论文库</h2>
+        <div id="s-status" class="status-box">…</div>
+        <label for="s-cat-add">arXiv 类目（点 × 删除，回车添加，如 eess.SY）</label>
+        <div id="s-cats" class="chips"></div>
+        <input id="s-cat-add" placeholder="添加类目后回车" enterkeyhint="done">
+        <div class="row"><span>保留最近</span><select id="s-window"><option>30</option><option>60</option><option>90</option><option>180</option><option>365</option></select><span>天</span></div>
+        <label for="s-oakey">OpenAlex API key（可选，免费，留空不修改）</label>
+        <input id="s-oakey" type="password" placeholder="openalex.org/settings/api 免费申请，补全更快">
+        <label for="s-s2key">Semantic Scholar API key（可选，留空不修改）</label>
+        <input id="s-s2key" type="password" placeholder="有 key 才有 TL;DR">
+        <div class="btn-row">
+          <button id="s-save-lib" class="btn">保存</button>
+          <button id="s-sync" class="btn ghost">立即同步</button>
+          <button id="s-reset-seen" class="btn ghost">重置已看</button>
+        </div>
+      </section>
+      <section id="server-section">
+        <h2>连接</h2>
+        <label for="s-server">电脑端地址（手机需已连 Tailscale）</label>
+        <input id="s-server" placeholder="http://100.x.y.z:8766" inputmode="url">
+        <button id="s-save-server" class="btn ghost">保存并重连</button>
+      </section>
+      <p class="colophon">PaperScroll · 数据来自 arXiv、arXiv HTML、OpenAlex 与 Semantic Scholar<br>会议级别：CCF 推荐目录、CORE 排名<br>卡片只转述原文，以原文为准</p>
+    </div>
+  </main>
+
+  <nav class="tabbar" aria-label="主导航">
+    <button data-view="feed" class="on"><span>刷论文</span></button>
+    <button data-view="library"><span>书房</span></button>
+    <button data-view="settings"><span>设置</span></button>
+  </nav>
+
+  <!-- ============ ONBOARDING ============ -->
+  <div id="onboard" class="overlay hidden">
+    <div class="onboard-box">
+      <div class="kicker">PaperScroll · 创刊号</div>
+      <h1 class="ob-title">Read the frontier,<br><em>one swipe</em> at a time.</h1>
+      <p class="ob-sub">像刷短视频一样刷 arXiv。先告诉我你在研究什么——用英文写一句话，推荐会准很多。</p>
+      <textarea id="o-topic" rows="4" placeholder="robot manipulation, especially VLA models and diffusion policies for bimanual tasks"></textarea>
+      <div class="ob-examples" id="ob-examples"></div>
+      <input id="o-keywords" placeholder="子方向关键词（可选）">
+      <div id="o-prefs" class="prefs"></div>
+      <button id="o-go" class="btn big">开始刷</button>
+    </div>
+  </div>
+
+  <div id="sheet" class="sheet hidden">
+    <div class="sheet-backdrop"></div>
+    <div class="sheet-body"><div class="sheet-grip"></div><div id="sheet-content"></div></div>
+  </div>
+  <div id="viewer" class="viewer hidden"><div class="viewer-scroll"><img alt=""></div><div class="viewer-hint">点按放大 · 返回关闭</div></div>
+  <div id="toast" class="toast hidden" role="status"></div>
+</div>
+<script src="vendor/hyphen.js"></script>
+<script src="vendor/hyphen-en-us.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

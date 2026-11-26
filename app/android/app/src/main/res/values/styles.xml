@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <!-- Runtime theme: window painted in the app's paper colour (night: lamplit ink) so nothing flashes black. -->
+    <style name="AppTheme.NoActionBar" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="android:background">@null</item>
+        <item name="android:windowBackground">@color/ps_paper</item>
+        <item name="android:statusBarColor">@color/ps_paper</item>
+        <item name="android:navigationBarColor">@color/ps_paper</item>
+    </style>
+
+    <!-- Launch theme: system splash with the PaperScroll mark on paper. (No android:background here:
+         as a theme attribute it is inherited by every view, which is what drew a squashed image at the top.) -->
+    <style name="AppTheme.NoActionBarLaunch" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/ps_paper</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/splash_icon</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="android:windowBackground">@color/ps_paper</item>
+    </style>
+</resources>

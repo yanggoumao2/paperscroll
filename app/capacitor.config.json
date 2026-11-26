@@ -1,0 +1,20 @@
+{
+  "appId": "org.kunyu.paperscroll",
+  "appName": "PaperScroll",
+  "webDir": "www",
+  "server": {
+    "url": "http://set-by-build-apk:8766",
+    "androidScheme": "http",
+    "cleartext": true,
+    "errorPath": "offline.html"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#00000000"
+  },
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

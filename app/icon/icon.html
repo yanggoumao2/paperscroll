@@ -1,0 +1,40 @@
+<!doctype html>
+<!-- Master artwork for the launcher icon / splash, rendered by render-icons.ps1 with headless Edge.
+     A stack of journal pages (swipe-through) with a vermilion seal, in the app's paper / ink / vermilion palette.
+     ?m=full   square icon with paper background (legacy launchers, web)
+     ?m=fg     transparent foreground for the adaptive icon (inside the 66/108 safe zone)
+     ?m=splash transparent splash icon (inside the splash circle) -->
+<html><head><meta charset="utf-8"><style>
+@font-face { font-family: "Crimson Pro"; font-style: italic; src: url("../../web/fonts/CrimsonPro-italic-400_600.woff2") format("woff2"); font-weight: 400 600; }
+html, body { margin: 0; width: 1024px; height: 1024px; background: transparent; overflow: hidden; }
+body.full { background: #F3EEE4; }
+svg { position: absolute; inset: 0; margin: auto; }
+body.full svg { width: 700px; height: 700px; }
+body.fg svg { width: 560px; height: 560px; }
+body.splash svg { width: 600px; height: 600px; }
+</style></head>
+<body>
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <!-- back page, turned -->
+  <g transform="rotate(-9 50 52)">
+    <rect x="20" y="12" width="56" height="74" rx="3" fill="#E6DDCC" stroke="#1C1A16" stroke-width="2.4"/>
+  </g>
+  <!-- front page -->
+  <g transform="rotate(4 50 50)">
+    <rect x="22" y="10" width="56" height="76" rx="3" fill="#FFFDF8" stroke="#1C1A16" stroke-width="2.4"/>
+    <!-- masthead rule + title + text lines -->
+    <rect x="29" y="18" width="42" height="2.2" fill="#1C1A16"/>
+    <rect x="29" y="25" width="34" height="5" rx="1" fill="#1C1A16"/>
+    <rect x="29" y="35" width="42" height="2.4" rx="1.2" fill="#857D70"/>
+    <rect x="29" y="41" width="42" height="2.4" rx="1.2" fill="#857D70"/>
+    <rect x="29" y="47" width="30" height="2.4" rx="1.2" fill="#857D70"/>
+  </g>
+  <!-- vermilion seal -->
+  <g transform="rotate(-12 64 68)">
+    <circle cx="64" cy="68" r="17" fill="#C23B22"/>
+    <circle cx="64" cy="68" r="13.2" fill="none" stroke="#F3EEE4" stroke-width="1.6"/>
+    <text x="64" y="76.4" text-anchor="middle" font-family="Crimson Pro" font-style="italic" font-weight="600" font-size="24" fill="#F3EEE4">P</text>
+  </g>
+</svg>
+<script>document.body.className = new URLSearchParams(location.search).get("m") || "full";</script>
+</body></html>

@@ -1,0 +1,17 @@
+# systemd user service for the PaperScroll server (Linux).
+#   mkdir -p ~/.config/systemd/user && cp paperscroll.service ~/.config/systemd/user/
+#   edit WorkingDirectory below, then:
+#   systemctl --user daemon-reload && systemctl --user enable --now paperscroll
+#   loginctl enable-linger "$USER"     # keep it running when you are logged out
+[Unit]
+Description=PaperScroll arXiv feed server
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/paperscroll/server
+ExecStart=%h/paperscroll/server/.venv/bin/python run.py
+Restart=on-failure
+RestartSec=60
+
+[Install]
+WantedBy=default.target

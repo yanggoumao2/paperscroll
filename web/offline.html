@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PaperScroll · 连不上电脑</title>
+<style>
+  :root { --paper:#F3EEE4; --ink:#1C1A16; --muted:#857D70; --red:#C23B22; --rule:#D3C9B7; }
+  @media (prefers-color-scheme: dark) { :root { --paper:#15130F; --ink:#EFE8DA; --muted:#8E8677; --red:#E2573C; --rule:#36302A; } }
+  html,body { margin:0; height:100%; background:var(--paper); color:var(--ink); font-family:Georgia,"Noto Serif CJK SC",serif; }
+  main { min-height:100%; box-sizing:border-box; padding:72px 24px 32px; display:flex; flex-direction:column; gap:16px; max-width:520px; margin:0 auto; }
+  .k { font:500 11px/1 monospace; letter-spacing:.12em; color:var(--red); }
+  h1 { margin:0; font-size:34px; line-height:1.05; border-bottom:1.5px solid var(--ink); padding-bottom:14px; }
+  p, li { font-family:sans-serif; font-size:15px; line-height:1.65; color:var(--ink); margin:0; }
+  ol { margin:0; padding-left:20px; }
+  .muted { color:var(--muted); font-size:13px; }
+  button { font:700 16px sans-serif; min-height:48px; border:0; border-radius:3px; background:var(--red); color:#fff; }
+  input { font:15px monospace; padding:11px; border:1px solid var(--rule); background:transparent; color:var(--ink); border-radius:3px; }
+</style></head>
+<body><main>
+  <div class="k">PAPERSCROLL · OFFLINE</div>
+  <h1>连不上电脑</h1>
+  <p>PaperScroll 的论文库和界面都在你的电脑上，手机要通过 Tailscale 才能连到它。</p>
+  <ol><li>打开手机上的 Tailscale，确认显示 Connected</li><li>确认电脑开着机</li><li>点下面的按钮重试</li></ol>
+  <button id="go">重试</button>
+  <p class="muted">电脑地址</p>
+  <input id="addr" inputmode="url" value="__PAPERSCROLL_SERVER__">
+</main>
+<script>
+  var KEY = "ps.server-shell";
+  var addr = document.getElementById("addr");
+  try { var v = localStorage.getItem(KEY); if (v) addr.value = v; } catch (e) {}
+  document.getElementById("go").onclick = function () {
+    var u = (addr.value || "").trim().replace(/\/$/, "") || addr.defaultValue;
+    try { localStorage.setItem(KEY, u); } catch (e) {}
+    location.href = u + "/";
+  };
+</script>
+</body></html>

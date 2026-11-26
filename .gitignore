@@ -1,0 +1,25 @@
+# runtime data: database, figures, model, logs and config.json (contains API keys)
+/data/
+# local toolchains and caches
+/toolchain/
+/.uv-cache/
+/.uv-python/
+**/__pycache__/
+/server/.venv/
+# build outputs
+/dist/
+/web/download/
+/app/www/
+/app/node_modules/
+/app/build.log
+/app/icon/edge/
+/app/icon/*preview*.png
+/app/android/app/src/main/assets/public/
+/app/android/app/src/main/assets/capacitor.config.json
+/app/android/app/src/main/assets/capacitor.plugins.json
+/app/android/capacitor-cordova-android-plugins/
+# local, machine-specific helper scripts (only server/dev/ is published)
+/server/*.py
+!/server/run.py
+/server/*.ps1
+*.log

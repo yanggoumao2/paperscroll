@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">PaperScroll</string>
+    <string name="title_activity_main">PaperScroll</string>
+    <string name="package_name">org.kunyu.paperscroll</string>
+    <string name="custom_url_scheme">org.kunyu.paperscroll</string>
+</resources>
