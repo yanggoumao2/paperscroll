@@ -75,7 +75,7 @@ arXiv 每天上新几百篇，光看标题就要花很久。PaperScroll 把它�
 手机端需要一个私有网络，比如 Tailscale。
 
 ```bash
-git clone https://github.com/<you>/paperscroll.git
+git clone https://github.com/yanggoumao2/paperscroll.git
 cd paperscroll/server
 uv sync                      # 在 server/.venv 里安装依赖
 uv run python run.py         # 启动服务 http://127.0.0.1:8765

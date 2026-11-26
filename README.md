@@ -98,7 +98,7 @@ You need: a computer that stays on (Windows 10/11, Linux or macOS), Python 3.11�
 [uv](https://docs.astral.sh/uv/), and — for the phone — a private network such as Tailscale.
 
 ```bash
-git clone https://github.com/<you>/paperscroll.git
+git clone https://github.com/yanggoumao2/paperscroll.git
 cd paperscroll/server
 uv sync                      # creates server/.venv with the dependencies
 uv run python run.py         # serves http://127.0.0.1:8765

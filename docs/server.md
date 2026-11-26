@@ -26,7 +26,7 @@ No GPU is needed.
 ## Install
 
 ```bash
-git clone https://github.com/<you>/paperscroll.git
+git clone https://github.com/yanggoumao2/paperscroll.git
 cd paperscroll/server
 uv sync
 uv run python run.py
