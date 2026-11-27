@@ -151,12 +151,18 @@ Optional free API keys make enrichment faster:
 - [ ] iOS shell, release-signed APK in GitHub Releases
 - [ ] More sources (OpenReview, bioRxiv) and author/venue follow lists
 
-Suggestions are welcome — open an issue.
+Suggestions are welcome — open an issue, or pick an item and send a pull request.
 
 ## Contributing
 
-Bug reports, ideas and pull requests are welcome; please read [CONTRIBUTING.md](CONTRIBUTING.md).
-For anything else, contact **Kunyu Yang** at **kyyang26@m.fudan.edu.cn**.
+PaperScroll is open to everyone: bug fixes, better designs, new paper sources, docs.
+Have a better approach? Open an issue to discuss it, then fork the repository and send a pull request —
+every merged pull request makes you a contributor. See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow and
+how to make sure you are credited. For anything else, contact **Kunyu Yang** at **kyyang26@m.fudan.edu.cn**.
+
+<a href="https://github.com/yanggoumao2/paperscroll/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=yanggoumao2/paperscroll" alt="Contributors">
+</a>
 
 ## Acknowledgements
 

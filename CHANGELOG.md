@@ -4,6 +4,9 @@ PaperScroll is actively maintained; this file lists user-visible changes. Dates 
 
 ## Unreleased
 
+- Contribution guide in English and Chinese (fork → pull request, how to get credited), pull request template,
+  contributors gallery in the README.
+
 ## 0.1.0 — 2026-11-27
 
 First public release.

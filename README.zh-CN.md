@@ -126,12 +126,18 @@ uv run python run.py         # 启动服务 http://127.0.0.1:8765
 - [ ] iOS 外壳；在 GitHub Releases 提供正式签名的 APK
 - [ ] 更多来源（OpenReview、bioRxiv），关注作者 / 会议
 
-欢迎在 Issue 里提需求。
+欢迎在 Issue 里提需求，也欢迎认领其中一项直接提交 Pull Request。
 
 ## 参与与反馈
 
-欢迎提交 Bug、建议和 Pull Request，请先看 [CONTRIBUTING.md](CONTRIBUTING.md)。
+PaperScroll 欢迎所有人一起改进：修 Bug、更好的设计方案、新的论文来源、文档都可以。
+有更好的方案？先开 Issue 讨论，再 Fork 仓库提交 Pull Request，**合并后即成为本仓库的贡献者**。
+具体流程和如何确保署名见 [CONTRIBUTING.zh-CN.md](CONTRIBUTING.zh-CN.md)。
 其他问题请联系 **杨昆谕（Kunyu Yang）**：**kyyang26@m.fudan.edu.cn**
+
+<a href="https://github.com/yanggoumao2/paperscroll/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=yanggoumao2/paperscroll" alt="贡献者">
+</a>
 
 ## 致谢
 
