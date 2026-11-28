@@ -66,6 +66,10 @@ def init() -> None:
         if col not in cols:
             con.execute(f"ALTER TABLE papers ADD COLUMN {col} {typ}")
     con.execute("CREATE INDEX IF NOT EXISTS papers_oa ON papers(oa_at)")   # status counts without scanning blobs
+    ecols = {r["name"] for r in con.execute("PRAGMA table_info(events)")}
+    if "eid" not in ecols:   # client event id: a resent event is stored once
+        con.execute("ALTER TABLE events ADD COLUMN eid TEXT")
+    con.execute("CREATE UNIQUE INDEX IF NOT EXISTS events_eid ON events(eid) WHERE eid IS NOT NULL")
     con.commit()
     con.close()
 

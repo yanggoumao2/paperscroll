@@ -130,9 +130,12 @@
   const hi = (s) => esc(hyph(s || "")).replace(/(?:(?:&gt;|[+~≈])?\d+(?:\.\d+)?\s?(?:%|×|x\b|-fold|\s?pp\b|\s?(?:percentage )?points\b))|\bstate-of-the-art\b|\bSOTA\b/gi, (m) => `<b class="num">${m}</b>`);
   const pct = (t) => (t < 1 ? "&lt;1%" : Math.round(t) + "%");
   function whyHTML(c) {
-    if (c.explore) return `<span class="w-ex">邻近领域</span>换换口味，离你的课题不远`;
+    if (c.explore) return `<span class="w-ex">邻近领域</span>换换口味，离你常看的方向不远`;
     const w = c.why || {}, bits = [];
-    if (w.top != null) bits.push(`相关度 前 ${pct(w.top)}`);
+    if (w.reason === "interest" && w.label) bits.push(`你常看 <i>${esc(w.label)}</i>`);
+    else if (w.reason === "session") bits.push(w.label ? `接着刚才的 <i>${esc(w.label)}</i>` : "接着你刚才在看的");
+    else if (w.reason === "author" && w.label) bits.push(`你喜欢过 <i>${esc(w.label)}</i> 的论文`);
+    if (w.top != null && !bits.length) bits.push(`相关度 前 ${pct(w.top)}`);
     if (w.hits && w.hits.length) bits.push(`提到 ${w.hits.map((h) => `<i>${esc(h)}</i>`).join("、")}`);
     return bits.length ? `<span class="w-lb">为何推荐</span>${bits.join(" · ")}` : "";
   }
@@ -443,17 +446,32 @@
     } catch { /* offline: try next time */ }
   }
 
+  // strong implicit signals for the recommender (figure, close reading, links, share), once per card and kind
+  const engaged = new Set();
+  function engage(c, kind) {
+    if (!c || state.offline) return;
+    const k = c.id + "|" + kind;
+    if (engaged.has(k)) return;
+    engaged.add(k); sendEvent(c.id, kind);
+  }
+
   const pending = ls.get("pending", []);
   async function sendEvent(id, kind, extra = {}) {
-    const ev = { id, kind, ...extra };
+    // eid lets the server drop a resend of an event it already stored (a timed-out request may have arrived)
+    const ev = { id, kind, eid: Date.now().toString(36) + Math.random().toString(36).slice(2, 8), ...extra };
     try { await api("/api/event", { method: "POST", body: ev, timeout: 8000 }); }
     catch { pending.push(ev); ls.set("pending", pending.slice(-200)); }
   }
+  let flushing = false;
   async function flushPending() {
-    while (pending.length) {
-      try { await api("/api/event", { method: "POST", body: pending[0], timeout: 8000 }); pending.shift(); ls.set("pending", pending); }
-      catch { return; }
-    }
+    if (flushing) return;   // two overlapping flushes would send the same event twice
+    flushing = true;
+    try {
+      while (pending.length) {
+        try { await api("/api/event", { method: "POST", body: pending[0], timeout: 8000 }); pending.shift(); ls.set("pending", pending); }
+        catch { return; }
+      }
+    } finally { flushing = false; }
   }
 
   // taps: buttons, plus double-tap anywhere else on the card = like
@@ -473,12 +491,12 @@
       return;
     }
     const link = e.target.closest("[data-u]");
-    if (link) { openUrl(link.dataset.u); return; }
+    if (link) { engage(c, "link"); openUrl(link.dataset.u); return; }
     if (!b) return;
     if (b.dataset.act === "zoom" || (b.dataset.act === "detail" && !b.closest(".actions"))) {   // wait: may become a double tap
       clearTimeout(feedEl._zoomT);
       const k = b.dataset.act;
-      feedEl._zoomT = setTimeout(() => (k === "zoom" ? openViewer(abs(c.fig)) : openDetail(c)), 330);
+      feedEl._zoomT = setTimeout(() => { engage(c, k === "zoom" ? "fig" : "read"); k === "zoom" ? openViewer(abs(c.fig)) : openDetail(c); }, 330);
       return;
     }
     act(b.dataset.act, c, b, el);
@@ -513,11 +531,11 @@
     } else if (kind === "note") {
       openNote(c, btn);
     } else if (kind === "share") {
-      share(c);
+      engage(c, "share"); share(c);
     } else if (kind === "pdf") {
-      openUrl(c.pdf_url);
+      engage(c, "link"); openUrl(c.pdf_url);
     } else if (kind === "detail") {
-      openDetail(c);
+      engage(c, "read"); openDetail(c);
     }
   }
 
@@ -716,6 +734,7 @@
       cats = s.categories.slice(); renderCats();
       $("#s-window").value = String(s.window_days);
       renderStatus(s);
+      api("/api/recsys").then(renderRecsys).catch(() => { $("#s-recsys").textContent = "—"; });
     } catch { $("#s-status").textContent = "连不上电脑端"; }
     $("#s-server").value = server() || (native ? location.origin : DEFAULT_SERVER);
     $("#server-section").classList.toggle("hidden", !native);
@@ -730,7 +749,15 @@
       每天 ${esc(s.sync_times.join(" / "))} 自动更新 · 状态 ${st}
       ${s.has_openalex_key ? "" : "<br>未设 OpenAlex key：用共享免费额度，每天补约 2 万篇"}`;
   }
-  function renderCats() {
+  function renderRecsys(r) {
+    if (r.version === "v1") { $("#s-recsys").textContent = "当前使用旧版推荐（只用课题和喜欢）"; return; }
+    const ints = r.interests || [];
+    $("#s-recsys").innerHTML = (ints.length
+      ? ints.map((x) => `· ${esc(x.label || "未命名")} <span class="muted">${x.papers} 篇</span>`).join("<br>")
+      : "还在了解你：多刷几篇，看得久的、点开图或精读的会被记住") +
+      `<br>你平时每篇看 ${esc(String(r.median_dwell))} 秒；快速划过的会少推`;
+  }
+    function renderCats() {
     $("#s-cats").innerHTML = cats.map((c, i) => `<span class="chip">${esc(c)}<button data-i="${i}" aria-label="删除 ${esc(c)}">×</button></span>`).join("");
   }
   $("#s-cats").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { cats.splice(+b.dataset.i, 1); renderCats(); } });

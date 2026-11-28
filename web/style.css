@@ -343,3 +343,4 @@ input:focus, textarea:focus, select:focus { border-color: var(--ink); }
   .card [data-r] { opacity: 1; transform: none; }
 }
 
+.status-box .muted { opacity: .6; }

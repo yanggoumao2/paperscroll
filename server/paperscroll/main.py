@@ -127,7 +127,7 @@ class FeedIn(BaseModel):
 @app.post("/api/feed")
 async def feed(f: FeedIn):
     cfg = config.load()
-    ids, exp, why = rank.feed(max(1, min(20, f.n)), int(cfg["window_days"]), f.pin)
+    ids, exp, why = rank.feed(max(1, min(20, f.n)), int(cfg["window_days"]), f.pin, cfg.get("recommender", "v2"))
     task = asyncio.ensure_future(figures.ensure(ids))
     try:   # wait briefly for figures/affiliations; the rest is fetched lazily by /api/img
         await asyncio.wait_for(asyncio.shield(task), 5)
@@ -138,6 +138,13 @@ async def feed(f: FeedIn):
         c["explore"] = c["id"] in exp
         c["why"] = why.get(c["id"], {})
     return {"cards": cards, "indexed": len(INDEX.ids), "job": jobs.STATUS}
+
+
+@app.get("/api/recsys")
+def recsys_state():
+    """What the recommender has learned so far: interests, usual dwell time."""
+    from . import recsys
+    return {**recsys.explain(), "version": config.load().get("recommender", "v2")}
 
 
 @app.post("/api/reset_seen")
@@ -169,9 +176,10 @@ async def img(pid: str):
 
 class EventIn(BaseModel):
     id: str
-    kind: str            # view | skip | like | unlike | save | unsave | hide | unhide | comment
+    kind: str            # view | skip | like | unlike | save | unsave | hide | unhide | comment | fig | read | link | share
     dwell: float | None = None
     text: str | None = None
+    eid: str | None = None
 
 
 FLAGS = {"like": ("liked", 1), "unlike": ("liked", 0), "save": ("saved", 1), "unsave": ("saved", 0),
@@ -182,7 +190,10 @@ FLAGS = {"like": ("liked", 1), "unlike": ("liked", 0), "save": ("saved", 1), "un
 def event(e: EventIn):
     now = datetime.now(timezone.utc).isoformat(timespec="seconds")
     with db.writer() as w:
-        w.execute("INSERT INTO events(ts,id,kind,dwell,text) VALUES(?,?,?,?,?)", (now, e.id, e.kind, e.dwell, e.text))
+        cur = w.execute("INSERT OR IGNORE INTO events(ts,id,kind,dwell,text,eid) VALUES(?,?,?,?,?,?)",
+                        (now, e.id, e.kind, e.dwell, e.text, (e.eid or None) and e.eid[:40]))
+        if not cur.rowcount:   # duplicate of an event already stored
+            return {"ok": True, "dup": True}
         if e.kind in FLAGS or e.kind == "comment":
             w.execute("INSERT OR IGNORE INTO interactions(id, updated) VALUES(?,?)", (e.id, now))
         if e.kind in FLAGS:

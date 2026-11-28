@@ -111,8 +111,56 @@ def bm25_scores(p: dict, limit: int = 1500) -> dict[str, float]:
 
 # ---------------------------------------------------------------- feed
 
-def feed(n: int = 6, window_days: int = 90, pin: str | None = None) -> tuple[list[str], set[str], dict]:
+def feed(n: int = 6, window_days: int = 90, pin: str | None = None, version: str = "v2") -> tuple[list[str], set[str], dict]:
     """Pick the next batch; returns (paper ids in display order, ids that are explore cards, why-recommended per id)."""
+    if version != "v1":
+        try:
+            return _feed_v2(n, window_days, pin)
+        except Exception:   # never leave the feed empty because of the new recommender
+            import logging
+            logging.getLogger("paperscroll.rank").exception("recommender v2 failed; falling back to v1")
+    return _feed_v1(n, window_days, pin)
+
+
+def _excluded() -> set[str]:
+    con = db.connect()
+    ex = {r["id"] for r in con.execute("SELECT id FROM seen")} | \
+         {r["id"] for r in con.execute("SELECT id FROM interactions WHERE hidden=1")}
+    con.close()
+    return ex
+
+
+def _keyword_hits(p: dict, picked: list[str], why: dict) -> None:
+    kws = [k.strip() for k in re.split(r"[,，;；]", p.get("keywords") or "") if k.strip()]
+    if not kws:
+        return
+    con = db.connect()
+    for pid in picked:
+        r = con.execute("SELECT title, abstract FROM papers WHERE id=?", (pid,)).fetchone()
+        if r:
+            text = f"{r['title']} {r['abstract']}".lower()
+            why.setdefault(pid, {})["hits"] = [k for k in kws if k.lower() in text][:3]
+    con.close()
+
+
+def _mark_seen(picked: list[str]) -> None:
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    with db.writer() as w:
+        w.executemany("INSERT OR IGNORE INTO seen(id, ts) VALUES(?,?)", [(i, stamp) for i in picked])
+
+
+def _feed_v2(n: int, window_days: int, pin: str | None) -> tuple[list[str], set[str], dict]:
+    from . import recsys
+    p = get_profile()
+    picked, exp_ids, why = recsys.recommend(p, topic_vector(p), bm25_scores(p), n, window_days, _excluded())
+    if pin and pin not in picked:
+        picked.insert(0, pin)
+    _keyword_hits(p, picked, why)
+    _mark_seen(picked)
+    return picked, exp_ids, why
+
+
+def _feed_v1(n: int = 6, window_days: int = 90, pin: str | None = None) -> tuple[list[str], set[str], dict]:
     p = get_profile()
     prefs = p["prefs"]
     q = query_vector(p)

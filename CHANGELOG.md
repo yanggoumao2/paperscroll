@@ -4,6 +4,14 @@ PaperScroll is actively maintained; this file lists user-visible changes. Dates 
 
 ## Unreleased
 
+- Recommender v2 (`server/paperscroll/recsys.py`): dwell time relative to your usual pace, figure / close-reading /
+  link / share signals, multiple interests (weighted spherical k-means, item-to-item recall), recall channels for
+  topic, session, liked authors and exploration, Thompson-sampling allocation between channels, online-learned
+  weights for recency / citations / venue / keywords, near-duplicate filtering. `"recommender": "v1"` in
+  `data/config.json` switches back. Settings page shows the learned interests.
+- Events carry a client id; resent events are stored once (older versions could record the same view twice).
+- `server/dev/rec_eval.py`: offline replay of your own history (read vs skipped, ROC-AUC, v1 vs v2).
+
 - Contribution guide in English and Chinese (fork → pull request, how to get credited), pull request template,
   contributors gallery in the README.
 

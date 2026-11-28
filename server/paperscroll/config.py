@@ -27,6 +27,7 @@ DEFAULTS = {
     "sync_times": ["12:35", "23:30"],
     "host": "127.0.0.1",
     "port": 8765,
+    "recommender": "v2",     # "v1" = the original Rocchio ranking
 }
 
 _lock = threading.Lock()
