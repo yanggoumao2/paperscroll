@@ -28,7 +28,10 @@
         body: opts.body ? JSON.stringify(opts.body) : undefined,
         signal: ctl.signal,
       });
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      if (!r.ok) {
+        let d = ""; try { d = (await r.json()).detail || ""; } catch { /* not JSON */ }
+        throw new Error(d || `HTTP ${r.status}`);
+      }
       return opts.raw ? r : r.json();
     } finally { clearTimeout(t); }
   }
@@ -186,7 +189,7 @@
     return `
       <div class="card-body">
         <div class="folio" ${r()}><span class="no">No.${String(idx).padStart(4, "0")}</span><span>${esc(c.primary)}</span>
-          <span class="grow"></span><span>${esc(c.published)}</span></div>
+          <span class="grow"></span><span>${esc(c.published)}</span><button class="tr-btn" data-act="translate" aria-label="翻译这篇">译</button></div>
         ${g.name || kinds ? `<div class="kick" ${r()}>${g.name ? `<span class="name">${esc(g.name)}</span>` : ""}${kinds}</div>` : ""}
         <h2 lang="en" ${r()}>${esc(c.title)}</h2>
         ${why ? `<div class="why" ${r()}>${why}</div>` : ""}
@@ -536,6 +539,8 @@
       engage(c, "link"); openUrl(c.pdf_url);
     } else if (kind === "detail") {
       engage(c, "read"); openDetail(c);
+    } else if (kind === "translate") {
+      translateCard(c, cardEl, btn);
     }
   }
 
@@ -589,6 +594,110 @@
     setTimeout(() => (ptr.style.transition = ""), 320);
   });
 
+  // ---------------------------------------------------------------- translation (only on request)
+  // A tap on 译 translates this paper's title and abstract sentences (DeepL on the computer, cached there);
+  // a second tap shows the original again. Selecting any text offers to translate just the selection.
+  const LANG_ATTR = { "ZH-HANS": "zh-Hans", "ZH-HANT": "zh-Hant", "EN-US": "en", "PT-BR": "pt" };
+  const langAttr = (l) => LANG_ATTR[l] || (l || "zh").toLowerCase();
+  async function getTranslation(c) {
+    if (c._tr) return c._tr;
+    c._tr = await api("/api/translate", { method: "POST", body: { id: c.id }, timeout: 45000 });
+    return c._tr;
+  }
+  function trError(e) {
+    const m = e.message || "";
+    toast(/no DeepL/.test(m) ? "先在设置里填 DeepL key" : /quota/.test(m) ? "DeepL 本月额度用完了" : "翻译失败：" + m, 2600);
+  }
+  async function translateCard(c, el, btn) {
+    if (!el) return;
+    if (el._orig) {   // back to the original
+      for (const [node, html, lang] of el._orig) { node.innerHTML = html; node.setAttribute("lang", lang); }
+      el._orig = null; el.classList.remove("translated"); btn?.classList.remove("on"); if (btn) btn.textContent = "译";
+      fitCard(el); return;
+    }
+    btn?.classList.add("busy");
+    let tr;
+    try { tr = await getTranslation(c); } catch (e) { trError(e); return; } finally { btn?.classList.remove("busy"); }
+    const L = langAttr(tr.lang), roles = c.roles || {}, S = tr.sents || [];
+    const orig = [];
+    const swap = (node, html) => { if (!node) return; orig.push([node, node.innerHTML, node.getAttribute("lang") || "en"]); node.innerHTML = html; node.setAttribute("lang", L); };
+    swap($("h2", el), esc(tr.title));
+    const lbl = { p: "问题", m: "方法", r: "结果" }, key = { p: "problem", m: "method", r: "result" };
+    for (const k of ["p", "m", "r"]) {
+      const row = $(".g-" + k, el), i = roles[key[k]];
+      if (row && i != null && S[i]) swap(row, `<span class="rh">${lbl[k]}</span>${hi(S[i])}`);
+    }
+    const used = new Set(Object.values(roles));
+    const rest = $(".rest", el);
+    const sep = /^(zh|ja)/.test(L) ? "" : " ";   // no space between CJK sentences
+    if (rest) swap(rest, `<span class="lbl">摘要其余</span>${hi(S.filter((_, k) => !used.has(k)).join(sep))}`);
+    const tldr = $(".tldr", el);
+    if (tldr) swap(tldr, hi(S.slice(0, 2).join(sep)));
+    el._orig = orig; el.classList.add("translated");
+    if (btn) { btn.classList.add("on"); btn.textContent = "原文"; }
+    fitCard(el);
+  }
+  async function translateSheet(c, btn) {
+    const box = $("#sheet-content");
+    if (box._orig) {
+      for (const [node, html, lang] of box._orig) { node.innerHTML = html; node.setAttribute("lang", lang); }
+      box._orig = null; btn.classList.remove("on"); btn.textContent = "译"; return;
+    }
+    btn.classList.add("busy");
+    let tr;
+    try { tr = await getTranslation(c); } catch (e) { trError(e); return; } finally { btn.classList.remove("busy"); }
+    const L = langAttr(tr.lang), orig = [];
+    const swap = (node, html) => { if (!node) return; orig.push([node, node.innerHTML, node.getAttribute("lang") || "en"]); node.innerHTML = html; node.setAttribute("lang", L); };
+    swap($("h3", box), esc(tr.title));
+    const abs = $(".abs", box);
+    if (abs) {
+      const sep = /^(zh|ja)/.test(L) ? "" : " ";
+      swap(abs, $$(":scope > span", abs).map((sp, i) => `<span class="${sp.className}">${tr.sents[i] != null ? hi(tr.sents[i]) : sp.innerHTML}</span>`).join(sep));
+    }
+    box._orig = orig; btn.classList.add("on"); btn.textContent = "原文";
+  }
+
+  // translate a selection: a small 译 button appears under the selected text
+  const selBtn = document.createElement("button");
+  selBtn.className = "sel-tr hidden"; selBtn.textContent = "译 选中内容";
+  const selPop = document.createElement("div");
+  selPop.className = "tr-pop hidden";
+  document.addEventListener("DOMContentLoaded", () => { $("#app").append(selBtn, selPop); });
+  if (document.readyState !== "loading") $("#app")?.append(selBtn, selPop);
+  let selText = "", selT = 0;
+  document.addEventListener("selectionchange", () => {
+    clearTimeout(selT);
+    selT = setTimeout(() => {
+      const sel = document.getSelection();
+      let t = "";
+      if (sel && !sel.isCollapsed && sel.rangeCount) {   // without our own labels (问题 / 方法 / 结果 …)
+        const frag = sel.getRangeAt(0).cloneContents();
+        for (const x of frag.querySelectorAll(".rh, .lbl, .w-lb, .tr-btn")) x.textContent = "";
+        t = frag.textContent.replace(/­/g, "").replace(/\s+/g, " ").trim();
+      }
+      const node = sel && sel.anchorNode && (sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement);
+      if (t.length < 2 || t.length > 4000 || !node || !node.closest("#feed, #sheet, #library")) { selBtn.classList.add("hidden"); return; }
+      selText = t;
+      const r = sel.getRangeAt(0).getBoundingClientRect(), app = $("#app").getBoundingClientRect();
+      const top = Math.min(r.bottom - app.top + 10, app.height - 120);
+      selBtn.style.top = Math.max(8, top) + "px";
+      selBtn.style.left = Math.min(Math.max(8, r.left - app.left + r.width / 2 - 56), app.width - 128) + "px";
+      selBtn.classList.remove("hidden");
+    }, 350);
+  });
+  selBtn.addEventListener("pointerdown", (e) => e.preventDefault());   // keep the selection while tapping
+  selBtn.addEventListener("click", async () => {
+    const text = selText; selBtn.classList.add("hidden");
+    selPop.innerHTML = `<div class="tp-src">${esc(text.length > 160 ? text.slice(0, 160) + "…" : text)}</div><div class="tp-out">翻译中…</div>`;
+    selPop.classList.remove("hidden");
+    try {
+      const r = await api("/api/translate", { method: "POST", body: { texts: [text] }, timeout: 45000 });
+      $(".tp-out", selPop).textContent = r.texts[0];
+      $(".tp-out", selPop).setAttribute("lang", langAttr(r.lang));
+    } catch (e) { selPop.classList.add("hidden"); trError(e); }
+  });
+  document.addEventListener("pointerdown", (e) => { if (!selPop.contains(e.target) && e.target !== selBtn) selPop.classList.add("hidden"); }, true);
+
   // ---------------------------------------------------------------- sheet / viewer
   function openSheet(html) {
     $("#sheet-content").innerHTML = html;
@@ -605,6 +714,7 @@
     const facts = factsHTML(c);
     openSheet(`
       <div class="kicker">${esc(c.primary)} · ${esc(c.published)}${c.venue ? " · " + esc(c.venue) : ""}${tierText(c) ? " · " + tierText(c) : ""}</div>
+      <button class="tr-btn sheet-tr" aria-label="翻译这篇">译</button>
       <h3 lang="en">${esc(c.title)}</h3>
       ${c.fig ? `<figure class="sheet-fig" data-zoom="${esc(abs(c.fig))}"><img alt="Key figure" src="${esc(abs(c.fig))}" onerror="this.parentNode.remove()"></figure>` : ""}
       ${g.name || (g.kinds || []).length ? `<div class="kick">${g.name ? `<span class="name">${esc(g.name)}</span>` : ""}${(g.kinds || []).map((k) => `<span class="kind">${esc(k)}</span>`).join("")}</div>` : ""}
@@ -623,6 +733,8 @@
       </div>`);
     $$("#sheet-content [data-u]").forEach((b) => b.addEventListener("click", () => openUrl(b.dataset.u)));
     $("#sheet-content .sheet-fig")?.addEventListener("click", (e) => openViewer(e.currentTarget.dataset.zoom));
+    $("#sheet-content")._orig = null;
+    $("#sheet-content .sheet-tr").addEventListener("click", (e) => translateSheet(c, e.currentTarget));
   }
 
   function openNote(c, btn) {
@@ -735,6 +847,7 @@
       $("#s-window").value = String(s.window_days);
       renderStatus(s);
       api("/api/recsys").then(renderRecsys).catch(() => { $("#s-recsys").textContent = "—"; });
+      api("/api/translate/info").then(renderTranslate).catch(() => { $("#s-tr-usage").textContent = "—"; });
     } catch { $("#s-status").textContent = "连不上电脑端"; }
     $("#s-server").value = server() || (native ? location.origin : DEFAULT_SERVER);
     $("#server-section").classList.toggle("hidden", !native);
@@ -749,7 +862,23 @@
       每天 ${esc(s.sync_times.join(" / "))} 自动更新 · 状态 ${st}
       ${s.has_openalex_key ? "" : "<br>未设 OpenAlex key：用共享免费额度，每天补约 2 万篇"}`;
   }
-  function renderRecsys(r) {
+  function renderTranslate(t) {
+    $("#s-tr-lang").innerHTML = Object.entries(t.langs).map(([k, v]) => `<option value="${esc(k)}" ${k === t.lang ? "selected" : ""}>${esc(v)}</option>`).join("");
+    const u = t.usage;
+    $("#s-tr-usage").textContent = !t.has_key ? "未设置 DeepL key：翻译不可用"
+      : u && u.limit ? `DeepL 本月已用 ${u.used.toLocaleString()} / ${u.limit.toLocaleString()} 字符（每篇约 1,500）`
+      : "DeepL key 已设置";
+  }
+  $("#s-tr-save").addEventListener("click", async () => {
+    const body = { translate_lang: $("#s-tr-lang").value };
+    const k = $("#s-deepl").value.trim(); if (k) body.deepl_api_key = k;
+    try {
+      await api("/api/config", { method: "PUT", body }); $("#s-deepl").value = "";
+      state.cards.forEach((c) => { c._tr = null; });
+      toast("已保存"); renderTranslate(await api("/api/translate/info"));
+    } catch (e) { toast("保存失败：" + e.message); }
+  });
+    function renderRecsys(r) {
     if (r.version === "v1") { $("#s-recsys").textContent = "当前使用旧版推荐（只用课题和喜欢）"; return; }
     const ints = r.interests || [];
     $("#s-recsys").innerHTML = (ints.length

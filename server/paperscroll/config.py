@@ -24,6 +24,8 @@ DEFAULTS = {
     "window_days": 90,
     "s2_api_key": "",
     "openalex_api_key": "",
+    "deepl_api_key": "",
+    "translate_lang": "ZH-HANS",
     "sync_times": ["12:35", "23:30"],
     "host": "127.0.0.1",
     "port": 8765,

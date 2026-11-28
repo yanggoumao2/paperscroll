@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS interactions(
 CREATE TABLE IF NOT EXISTS seen(id TEXT PRIMARY KEY, ts TEXT);
 CREATE TABLE IF NOT EXISTS events(ts TEXT, id TEXT, kind TEXT, dwell REAL, text TEXT);
 CREATE TABLE IF NOT EXISTS kv(k TEXT PRIMARY KEY, v TEXT);
+CREATE TABLE IF NOT EXISTS translations(h TEXT PRIMARY KEY, lang TEXT, text TEXT, ts REAL);
 """
 
 _write_lock = threading.RLock()

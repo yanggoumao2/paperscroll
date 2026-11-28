@@ -63,7 +63,8 @@ def status():
     return {"papers": total, "indexed": len(INDEX.ids), "s2_enriched": enriched, "newest": newest,
             "job": jobs.STATUS, "categories": cfg["categories"], "window_days": cfg["window_days"],
             "sync_times": cfg["sync_times"], "has_s2_key": bool(cfg.get("s2_api_key")),
-            "has_openalex_key": bool(cfg.get("openalex_api_key")), "oa_enriched": oa, "web_version": web_version()}
+            "has_openalex_key": bool(cfg.get("openalex_api_key")), "has_deepl_key": bool(cfg.get("deepl_api_key")),
+            "translate_lang": cfg.get("translate_lang", "ZH-HANS"), "oa_enriched": oa, "web_version": web_version()}
 
 
 class ConfigIn(BaseModel):
@@ -71,6 +72,8 @@ class ConfigIn(BaseModel):
     window_days: int | None = None
     s2_api_key: str | None = None
     openalex_api_key: str | None = None
+    deepl_api_key: str | None = None
+    translate_lang: str | None = None
 
 
 CAT_RE = re.compile(r"^[a-z\-]+(\.[A-Za-z\-]+)?$")
@@ -91,6 +94,13 @@ def put_config(c: ConfigIn):
         cfg["s2_api_key"] = c.s2_api_key.strip()
     if c.openalex_api_key is not None:
         cfg["openalex_api_key"] = c.openalex_api_key.strip()
+    if c.deepl_api_key is not None:
+        cfg["deepl_api_key"] = c.deepl_api_key.strip()
+    if c.translate_lang is not None:
+        from .translate import LANGS
+        if c.translate_lang not in LANGS:
+            raise HTTPException(400, "unsupported language")
+        cfg["translate_lang"] = c.translate_lang
     config.save(cfg)
     jobs.trigger()
     return status()
@@ -145,6 +155,42 @@ def recsys_state():
     """What the recommender has learned so far: interests, usual dwell time."""
     from . import recsys
     return {**recsys.explain(), "version": config.load().get("recommender", "v2")}
+
+
+class TranslateIn(BaseModel):
+    id: str | None = None             # translate this paper's title + abstract sentences
+    texts: list[str] | None = None    # or arbitrary selected text
+    lang: str | None = None
+
+
+@app.post("/api/translate")
+def translate_(t: TranslateIn):
+    """Translate on demand only (a tap on 译, or a text selection); results are cached per language."""
+    from . import translate as tr
+    lang = t.lang or config.load().get("translate_lang", tr.DEFAULT_LANG)
+    try:
+        if t.id:
+            c = rank.cards_for([t.id])
+            if not c:
+                raise HTTPException(404, "unknown paper")
+            c = c[0]
+            sents = c["sents"] or [c["abstract"]]
+            out = tr.translate([c["title"]] + sents, lang)
+            return {"lang": lang, "title": out[0], "sents": out[1:]}
+        texts = [x[:5000] for x in (t.texts or [])][:20]
+        if not texts:
+            raise HTTPException(400, "nothing to translate")
+        return {"lang": lang, "texts": tr.translate(texts, lang, source=None)}
+    except tr.TranslateError as e:
+        raise HTTPException(400, str(e))
+
+
+@app.get("/api/translate/info")
+def translate_info():
+    from . import translate as tr
+    cfg = config.load()
+    return {"langs": tr.LANGS, "lang": cfg.get("translate_lang", tr.DEFAULT_LANG),
+            "has_key": bool(cfg.get("deepl_api_key")), "usage": tr.usage()}
 
 
 @app.post("/api/reset_seen")

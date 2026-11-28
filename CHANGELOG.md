@@ -4,6 +4,11 @@ PaperScroll is actively maintained; this file lists user-visible changes. Dates 
 
 ## Unreleased
 
+- On-demand translation through DeepL (free key is enough, set in Settings → 翻译): 译 on a card translates the
+  title and the problem/method/result lines, 译 in close reading translates the abstract sentence by sentence
+  (colours kept), and selecting any text offers to translate only the selection. Nothing is translated
+  automatically; results are cached per language. 17 target languages.
+
 - Recommender v2 (`server/paperscroll/recsys.py`): dwell time relative to your usual pace, figure / close-reading /
   link / share signals, multiple interests (weighted spherical k-means, item-to-item recall), recall channels for
   topic, session, liked authors and exploration, Thompson-sampling allocation between channels, online-learned

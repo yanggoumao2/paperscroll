@@ -62,6 +62,15 @@
         <button id="s-save-profile" class="btn">保存并换一批</button>
       </section>
       <section>
+        <h2>翻译</h2>
+        <label>只在你需要时翻译：点卡片右上角「译」翻译这一篇，或长按选中一段文字只翻译选中的部分。</label>
+        <div class="row"><span>译成</span><select id="s-tr-lang"></select></div>
+        <label for="s-deepl">DeepL API key（免费版即可，留空不修改）</label>
+        <input id="s-deepl" type="password" placeholder="deepl.com/your-account/keys">
+        <div id="s-tr-usage" class="status-box">…</div>
+        <button id="s-tr-save" class="btn">保存</button>
+      </section>
+      <section>
         <h2>推荐系统学到的</h2>
         <label>根据你在每篇上停留的时间、看图/精读/点链接、喜欢和收藏自动学习，越刷越准。</label>
         <div id="s-recsys" class="status-box">…</div>
